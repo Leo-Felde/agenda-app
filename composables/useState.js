@@ -1,0 +1,1 @@
+export const useAuthToken = () => useState('token', () => null)

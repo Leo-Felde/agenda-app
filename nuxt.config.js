@@ -2,6 +2,7 @@ import { defineNuxtConfig } from 'nuxt/config'
 
 // https://v3.nuxtjs.org/api/configuration/nuxt.config
 export default defineNuxtConfig({
+  ssr: false,
   css: [
     '~/assets/styles/main.sass',
     '@mdi/font/css/materialdesignicons.min.css',
@@ -15,13 +16,16 @@ export default defineNuxtConfig({
       'process.env.DEBUG': false,
     },
   },
-  buildModules: [
-    '@nuxtjs/eslint-module'
-  ],
   modules: [
-    '@nuxtjs/eslint-module'
+    '@nuxtjs/eslint-module',
+    'nuxt-snackbar'
   ],
   eslint: {
     fix: true
+  },
+  snackbar: {
+    top: true,
+    right: true,
+    duration: 2000
   }
 })
