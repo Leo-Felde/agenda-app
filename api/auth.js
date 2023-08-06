@@ -1,6 +1,6 @@
 import createAPI from './index'
 
-const route = 'api/auth'
+const route = '/auth'
 const api = createAPI(route)
 
 const methods = {
