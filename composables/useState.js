@@ -1,1 +1,1 @@
-export const useAuthToken = () => useState('token', () => null)
+export const useCurrentUser = () => useState('currentUser', () => {})

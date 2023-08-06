@@ -1,15 +1,16 @@
 export default defineNuxtRouteMiddleware((to) => {
-  const storedToken = localStorage.getItem('token')
-  const authenticated = useAuthToken()
+  const storedUser = JSON.parse(localStorage.getItem('userData'))
+  const user = useCurrentUser()
 
-  if (!authenticated.value && storedToken) {
-    authenticated.value = storedToken
+  if (!user?.value && storedUser) {
+    user.value = storedUser
   }
 
   const isAuthPage = to.fullPath.includes('/auth')
-  if (!authenticated.value && !isAuthPage) {
+  if (!user.value?.accessToken && !isAuthPage) {
     return navigateTo('/auth')
   }
-  
+
+
   return
 })

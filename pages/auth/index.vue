@@ -71,7 +71,7 @@ export default {
 
     const theme = useTheme()
     const snackbar = useSnackbar()
-    const token = useAuthToken()
+    const user = useCurrentUser()
 
     const form = ref(null)
     const userName = ref(null)
@@ -106,8 +106,9 @@ export default {
       try {
         const resp = await AuthAPI.login(params)
         invalidCredentials.value = false
-        token.value = resp.data.accessToken
-        localStorage.setItem('token', token.value)
+
+        user.value = resp.data
+        localStorage.setItem('userData',  JSON.stringify(user.value))
         return navigateTo('/')
       } catch (error) {
         if (error.response.status === 401) {
@@ -131,7 +132,7 @@ export default {
       loading,
       invalidCredentials,
       showPassword,
-      token,
+      user,
       authenticate,
       form
     }
