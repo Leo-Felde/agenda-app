@@ -8,10 +8,8 @@ export default defineNuxtRouteMiddleware((to) => {
 
   const isAuthPage = to.fullPath.includes('/auth')
   if (!authenticated.value && !isAuthPage) {
-    console.log('roteamento para o login')
     return navigateTo('/auth')
-  } else {
-    console.log('roteamento normal')
-    return
   }
+  
+  return
 })
