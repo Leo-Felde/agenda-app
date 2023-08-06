@@ -9,10 +9,7 @@ export default defineNuxtPlugin(nuxtApp => {
     ssr: true,
     components,
     labsComponents,
-    directives,
-    theme: {
-      defaultTheme: 'dark'
-    }
+    directives
   })
 
   nuxtApp.vueApp.use(vuetify)

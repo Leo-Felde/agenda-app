@@ -58,7 +58,7 @@
 </template>
 
 <script>
-import { ref, onBeforeMount } from 'vue'
+import { ref, onMounted } from 'vue'
 
 export default {
   name: 'ThemeButton',
@@ -66,7 +66,7 @@ export default {
   emits: ['toggleTheme'],
 
   setup (_, { emit }) {
-    const themeDark = ref(true) // pegar isso de prop?
+    const themeDark = ref(false) // isso seria legal vim do banco
     const transitioning = ref(false)
 
     const toggleTheme = () => {
@@ -116,7 +116,7 @@ export default {
       }
     }
 
-    onBeforeMount(() => {
+    onMounted(() => {
       handleClassList()
     })
 
