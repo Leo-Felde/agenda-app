@@ -1,10 +1,13 @@
 <template>
   <v-app>
-    <v-app-bar color="primary">
+    <v-app-bar>
       <template #prepend>
         <v-app-bar-nav-icon @click="drawer = !drawer" />
       </template>
-      <v-app-bar-title>
+      <v-app-bar-title
+        class="pointer"
+        @click="navigateTo('/')"
+      >
         AgendaApp
       </v-app-bar-title>
       <template #append>
@@ -13,8 +16,8 @@
         <v-menu :close-on-content-click="false">
           <template #activator="{ props }">
             <v-avatar
-              class="ml-3"
-              color="orange"
+              class="ml-3 pointer"
+              color="primary"
               v-bind="props"
             >
               <v-icon
@@ -40,12 +43,19 @@
       v-model="drawer"
       temporary
     >
-      <v-list>
+      <v-list
+        ref="DrawerList"
+        color="primary"
+      >
         <v-list-item
           v-for="item in items"
           :key="item.value"
           :prepend-icon="item.icon"
           :title="item.title"
+          :to="item.to"
+          tabindex="0"
+          :show="item.adminOnly ? userAdmin : true"
+          nuxt
         />
       </v-list>
     </v-navigation-drawer>
@@ -58,7 +68,7 @@
 </template>
 
 <script>
-import { ref } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useTheme, useDisplay } from 'vuetify'
 
 export default {
@@ -70,15 +80,38 @@ export default {
     const { mobile } = useDisplay()
 
     const drawer = ref(false)
-    
+    const DrawerList = ref(null)
     const items = ref([
       {
         title: 'Home',
         value: 'home',
         to: '/',
         icon: 'mdi-home'
-      }
+      },
+      {
+        title: 'Meu cadastro',
+        value: 'meu-cadastro',
+        to: '/meu-cadastro',
+        icon: 'mdi-badge-account'
+      },
+      {
+        title: 'Usuarios',
+        value: 'usuarios',
+        adminOnly: true,
+        to: '/usuarios',
+        icon: 'mdi-account'
+      },
+      {
+        title: 'Pessoas',
+        value: 'pessoas',
+        to: '/pessoas',
+        icon: 'mdi-account-group'
+      },
     ])
+
+    const userAdmin = computed(() => {
+      return user.value.tipos.includes('ROLE_ADMIN')
+    })
 
     const logout = () => {
       // criar confirmação?
@@ -86,12 +119,32 @@ export default {
       navigateTo('/auth')
     }
 
+    watch(() => drawer.value, () => {
+      if (drawer.value) {
+        DrawerList.value.focus()
+      }
+    })
+
+    onMounted(() => {
+      document.addEventListener('keydown', (e) => {
+        if(e.key === 'Escape') {
+          drawer.value = false
+        }
+      })
+    })
+
+    onBeforeUnmount(() => {
+      document.removeEventListener('keydown', () => {})
+    })
+
     return {
       theme,
       mobile,
       user,
       drawer,
       items,
+      DrawerList,
+      userAdmin,
       logout,
       toggleTheme: () => theme.global.name.value = theme.global.current.value.dark ? 'light' : 'dark'
     }

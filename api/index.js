@@ -10,7 +10,6 @@ const createAPI = (routeURL) => {
     ? { Authorization: `Bearer ${token}` }
     : {}
 
-  console.log(headers)
   const api = axios.create({
     baseURL,
     headers
