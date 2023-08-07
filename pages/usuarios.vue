@@ -11,9 +11,12 @@
       <v-btn
         color="primary"
         append-icon="mdi-account-plus"
+        @click="novoUsuario"
       >
         Adicionar usuário
       </v-btn>
+    </v-card-title>
+    <v-divider />
     <VDataTable
       item-value="name"
       fixed-header
@@ -35,11 +38,16 @@
           <v-btn
             icon="mdi-pencil"
             variant="text"
-            @click="$emit('editar', item.selectable)"
+            @click="editarUsuario(item.selectable)"
           />
         </td>
       </template>
     </VDataTable>
+    <FormDialogoUsuario
+      v-model="showDialog"
+      :usuario="usuarioSelecionado"
+      @atualizar="listarUsuarios"
+    />
   </v-card>
 </template>
 
@@ -59,7 +67,9 @@ export default {
     // const { $swal } = useNuxtApp()
 
     const loading = ref(false)
+    const showDialog = ref(false)
     const usuarios = ref([])
+    const usuarioSelecionado = ref({})
     const headers = ref([
       {
         title: 'Nome',
@@ -113,6 +123,17 @@ export default {
         loading.value = false
       }
     }
+
+    const editarUsuario = (usuario) => {
+      console.log(usuario)
+      usuarioSelecionado.value = usuario
+      showDialog.value = true
+    }
+
+    const novoUsuario = () => {
+      usuarioSelecionado.value = {}
+      showDialog.value = true
+    }
     
     onMounted(() => {
       listarUsuarios()
@@ -121,7 +142,12 @@ export default {
     return {
       headers,
       usuarios,
-      loading
+      loading,
+      showDialog,
+      usuarioSelecionado,
+      editarUsuario,
+      novoUsuario,
+      listarUsuarios
     }
   }
 }

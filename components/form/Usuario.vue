@@ -68,25 +68,22 @@
           :rules="[rules.required, rules.email]"
         />
       </v-col>
-    </v-row>
-    <!-- <v-row>
       <v-col
         cols="12"
         sm="12"
         md="4"
       >
-        <v-text-field
-          v-model="form.password"
-          label="Senha"
-          required
+        <v-select
+          v-if="form.tipos"
+          v-model="form.tipos"
+          :items="tiposUsuario"
+          item-title="text"
+          item-value="value"
           :readonly="readonly"
-          :type="showPassword ? 'text' : 'password'"
           :rules="[rules.required]"
-          :append-inner-icon="`mdi-eye${showPassword ? '' : '-off'}`"
-          @click:append-inner.stop="showPassword = !showPassword"
         />
       </v-col>
-    </v-row> -->
+    </v-row>
   </div>
 </template>
 
@@ -103,6 +100,10 @@ export default {
   setup (props) {
     const form = ref({})
     const showPassword = ref(false)
+    const tiposUsuario = ref([
+      { text: 'Usuário', value: 'ROLE_USER' },
+      { text: 'Admin', value: 'ROLE_ADMIN' },
+    ])
 
     const showDialog = computed(() => {
       return props.modelValue
@@ -112,13 +113,18 @@ export default {
       return `${props.usuario.id ? 'Editar' : 'Novo'} usuário`
     })
 
-    watch(() => props.usuario, (newValue) => {
-      form.value = newValue
+    watch(() => props.usuario, () => {
+      form.value = props.usuario
+    })
+
+    onMounted(() => {
+      form.value = props.usuario
     })
 
     return {
       form,
       showPassword,
+      tiposUsuario,
       rules,
       showDialog,
       title
