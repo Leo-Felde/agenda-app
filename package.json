@@ -21,6 +21,7 @@
     "nuxt-snackbar": "^1.0.3",
     "vue": "^3.3.4",
     "vue-server-renderer": "^2.7.10",
+    "vue-sweetalert2": "^5.0.5",
     "vue-template-compiler": "^2.7.10"
   },
   "devDependencies": {
