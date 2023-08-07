@@ -15,13 +15,14 @@
   "dependencies": {
     "@mdi/font": "^7.2.96",
     "@nuxtjs/axios": "^5.13.6",
+    "@sweetalert2/theme-dark": "^5.0.15",
     "core-js": "^3.32.0",
     "defu": "^6.1.2",
     "nuxt": "^3.6.5",
     "nuxt-snackbar": "^1.0.3",
+    "sweetalert2": "^11.7.20",
     "vue": "^3.3.4",
     "vue-server-renderer": "^2.7.10",
-    "vue-sweetalert2": "^5.0.5",
     "vue-template-compiler": "^2.7.10"
   },
   "devDependencies": {
