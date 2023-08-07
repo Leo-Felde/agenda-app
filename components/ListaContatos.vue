@@ -1,70 +1,130 @@
 <template>
-  <div>
-    <VDataTable
-      :headers="headers"
-      :items="contatos"
-      item-value="name"
-      class="elevation-1"
-    >
-      <template #item="{ item }">
-        <tr>
-          <td class="d-flex flex-column">
-            <span class="contact-name">
-              {{ item.selectable.pessoa.nome }}
-            </span>
-            <span
-              v-if="item.selectable.email"
-              class="contact-email"
+  <VDataTable
+    item-value="name"
+    fixed-header
+    :headers="headers"
+    :items="contatos"
+    :loading="loading"
+  >
+    <template #loading>
+      <VSkeletonLoader
+        v-for="i in 3"
+        :key="i"
+        width="100%"
+        height="100px"
+        class="my-2"
+      />
+    </template>
+
+    <template #item="{ item }">
+      <tr>
+        <td>
+          <div class="d-flex py-2">
+            <v-avatar
+              color="grey"
+              size="48"
             >
-              {{ item.selectable.email }}
-            </span>
-          </td>
-          <td>{{ item.selectable.tipoContato }}</td>
-          <td>{{ item.selectable.telefone }}</td>
-          <td>{{ item.selectable.pessoa.cpf }}</td>
-          <td>
-            <span class="endereco">
-              {{ item.selectable.pessoa.endereco.bairro }}
-              , {{ item.selectable.pessoa.endereco.cidade }} - {{ item.selectable.pessoa.endereco.estado }}
+              <img
+                :id="`image-${item.selectable.pessoa.id}`"
+                class="user-image"
+                src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1665px-No-Image-Placeholder.svg.png"
+              >
+            </v-avatar>
+            <div class="d-flex flex-column my-auto ml-2">
+              <span class="contact-name">
+                {{ item.selectable.pessoa.nome }}
+              </span>
+              <span
+                v-if="item.selectable.email"
+                class="contact-email"
+              >
+                {{ item.selectable.email }}
+              </span>
+            </div>
+            <v-icon
+              v-if="item.selectable.favorito"
+              color="yellow"
+              class="my-auto ml-5"
+            >
+              mdi-star
+            </v-icon>
+          </div>
+        </td>
+        <td>{{ item.selectable.tipoContato }}</td>
+        <td>{{ item.selectable.telefone }}</td>
+        <td>{{ item.selectable.pessoa.cpf }}</td>
+        <td>
+          <span class="endereco">
+            {{ item.selectable.pessoa.endereco.bairro }}
+            , {{ item.selectable.pessoa.endereco.cidade }} - {{ item.selectable.pessoa.endereco.estado }}
               
-            </span>
-          </td>
-          <td>
-            <v-btn
-              icon="mdi-dots-vertical"
-              variant="text"
-            />
-          </td>
-        </tr>
-      </template>
-    </VDataTable>
-  </div>
+          </span>
+        </td>
+        <td class="text-center">
+          <v-btn
+            icon="mdi-pencil"
+            variant="text"
+          />
+          <v-menu :close-on-content-click="false">
+            <template #activator="{ props }">
+              <v-btn
+                icon="mdi-dots-vertical"
+                variant="text"
+                v-bind="props"
+              />
+            </template>
+            <v-list>
+              <v-list-item @click="toggleFavorito(item.selectable)">
+                <v-list-item-title>
+                  {{ item.selectable.favorito ? 'Desfavoritar' : 'favoritar' }}
+                </v-list-item-title>
+              </v-list-item>
+              <v-list-item @click="excluirContato(item.selectable)">
+                <v-list-item-title>
+                  Excluir
+                </v-list-item-title>
+              </v-list-item>
+            </v-list>
+          </v-menu>
+        </td>
+      </tr>
+    </template>
+  </VDataTable>
 </template>
 
 <script>
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import { VDataTable } from 'vuetify/labs/VDataTable'
+import { VSkeletonLoader } from 'vuetify/labs/VSkeletonLoader'
 
-import ContatosAPI from '~/api/contatos'
-
+import ImagemAPI from '~/api/imagem'
 export default {
   components: {
-    VDataTable
+    VDataTable,
+    VSkeletonLoader
   },
 
-  setup() {
-    const user = useCurrentUser()
-    const snackbar = useSnackbar()
+  props: {
+    data: {
+      type: Array,
+      default: () => {}
+    },
 
+    loading: Boolean
+  },
+
+
+  emits: ['atualizar'],
+  setup (props) {
+    const { $swal } = useNuxtApp()
     const headers = ref([
       {
         title: 'Informações',
-        align: 'start',
         sortable: true,
         key: 'pessoa.nome'
       },
       {
-        title: 'Tipo',
+        title: 'Forma de contato',
         sortable: true,
         key: 'tipoContato'
       },
@@ -89,40 +149,93 @@ export default {
         key: 'actions'
       }
     ])
-    const contatos = ref([])
-    const loading = ref(false)
-    const page = ref(1)
 
-    const listarUsuarios = async () => {
-      const id = user.value.id 
-      loading.value = true
+    const contatos = computed(() => {
+      return props.data
+    })
 
+    watch(() => contatos.value, () => {
+      displayImages()
+    })
+
+    const displayImages = () => {
+      contatos.value.forEach(async (contato) => {
+        if (contato.pessoa.foto) {
+          const foto = await getImage(contato.pessoa.id)
+          const imageElement = document.getElementById(`image-${contato.pessoa.id}`)
+          imageElement.src = foto
+        }
+      })
+    }
+
+    const getImage = async (id) => {
       try {
-        const resp = await ContatosAPI.listar(id)
-
-        console.log(resp)
-        contatos.value = resp.data
+        const resp = await ImagemAPI.carregar(id)
+        const blob = new Blob([resp.data], { type: 'image/png' })
+        const imageUrl = URL.createObjectURL(blob)
+        
+        return imageUrl
       } catch (error) {
         console.error(error)
-        snackbar.add({
-          type: 'error',
-          text: 'Ocorreu um erro ao listar os contatos'
-        })
-      } finally {
-        loading.value = false
       }
     }
 
-    onMounted(() => {
-      listarUsuarios()
-    })
+    const toggleFavorito = async (contato) => {
+      try {
+        console.log('favoritar/desfavoritar')
+        console.log(contato)
+        if (contato.favorito) {
+          $swal.fire({
+            title: 'Desfavoritar?',
+            showCancelButton: true,
+            confirmButtonText: 'Desfavoritar',
+            cancelButtonText: 'Cancelar',
+            reverseButtons: true
+          }).then((result) => {
+            if (result.isConfirmed) {
+              console.log('BBBBBBB')
+            } else if (
+            /* Read more about handling dismissals below */
+              result.dismiss === Swal.DismissReason.cancel
+            ) {
+              console.log('aaaaaaa')
+            }
+          })
+        }
+      } catch (error) {
+        console.error(error)
+      }
+    }
+
+    const excluirContato = async (contato) => {
+      try {
+        console.log('excluir')
+        console.log(contato)
+        
+        $swal.fire({
+          title: 'Excluir contato?',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Excluir',
+          confirmButtonColor: '#d33',
+          cancelButtonText: 'Cancelar',
+        }).then((result) => {
+          /* Read more about isConfirmed, isDenied below */
+          if (result.isConfirmed) {
+            // chamar exclusão
+          }
+        })
+      } catch (error) {
+        console.error(error)
+      }
+    }
+    
 
     return {
       headers,
       contatos,
-      loading,
-      page,
-      listarUsuarios
+      toggleFavorito,
+      excluirContato
     }
   }
 }
@@ -136,4 +249,9 @@ export default {
     font-size: 0.9rem
     color: #5b5b5be3
     
+.user-image
+  width: 70px
+
+:deep(.v-skeleton-loader__bone)
+  height: inherit
 </style>
