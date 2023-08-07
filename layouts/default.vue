@@ -1,14 +1,28 @@
 <template>
   <v-app>
-    <v-app-bar>
+    <link
+      id="dark"
+      href="//cdn.jsdelivr.net/npm/@sweetalert2/theme-dark@5.0.11/dark.css"
+      rel="stylesheet"
+      :disabled="!themeDark"
+    >
+    <link
+      id="bootstrap"
+      href="//cdn.jsdelivr.net/npm/@sweetalert2/theme-bootstrap-4@5.0.11/bootstrap-4.css"
+      rel="stylesheet"
+      :disabled="themeDark"
+    >
+    <v-app-bar elevation="1">
       <template #prepend>
         <v-app-bar-nav-icon @click="drawer = !drawer" />
       </template>
       <v-app-bar-title
-        class="pointer"
+        v-if="!mobile"
+        class="pointer text-primary"
         @click="navigateTo('/')"
       >
         AgendaApp
+        <v-icon> mdi-book-check-outline </v-icon>
       </v-app-bar-title>
       <template #append>
         <theme-button @toggleTheme="toggleTheme" />
@@ -26,14 +40,35 @@
               />
             </v-avatar>
           </template>
-          <v-card>
-            <v-list class="pa-0">
-              <v-list-item
-                title="sair"
-                prepend-icon="mdi-logout"
-                @click="logout"
-              />
-            </v-list>
+          <v-card
+            height="150"
+            width="300"
+            class="ml-4 d-flex flex-column"
+          >
+            <div class="d-flex pa-4">
+              <v-avatar
+                color="primary"
+                size="64"
+              >
+                <span class="text-uppercase text-h5">
+                  {{ user.username.slice(0, 1) }}
+                </span>
+              </v-avatar>
+              <div class="my-auto ml-2 d-flex flex-column">
+                <span class="text-capitalize">{{ user.username }}</span>
+                <span class="text-caption">loremIpsumDolor@email.com</span>
+              </div>
+            </div>
+            <v-divider />
+            <v-btn
+              block
+              @click="logout"
+            >
+              Sair
+              <v-icon class="ml-1">
+                mdi-logout
+              </v-icon>
+            </v-btn>
           </v-card>
         </v-menu>
       </template>
@@ -41,8 +76,17 @@
 
     <v-navigation-drawer
       v-model="drawer"
-      temporary
+      permanent
     >
+      <v-card-title
+        v-if="mobile"
+        class="my-2 text-center text-primary"
+        color="primary"
+      >
+        AgendaApp
+        <v-icon> mdi-book-check-outline </v-icon>
+      </v-card-title>
+      <v-divider />
       <v-list
         ref="DrawerList"
         color="primary"
@@ -60,15 +104,14 @@
       </v-list>
     </v-navigation-drawer>
       
-    <!-- aqui é renderizada a página atual -->
-    <v-main>
+    <v-main :class="{'main-wrapper my-4 ml-4 mr-8': !mobile}">
       <slot />
     </v-main>
   </v-app>
 </template>
 
 <script>
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed } from 'vue'
 import { useTheme, useDisplay } from 'vuetify'
 
 export default {
@@ -79,7 +122,7 @@ export default {
     const user = useCurrentUser()
     const { mobile } = useDisplay()
 
-    const drawer = ref(false)
+    const drawer = ref(true)
     const DrawerList = ref(null)
     const items = ref([
       {
@@ -113,10 +156,19 @@ export default {
       return user.value.tipos.includes('ROLE_ADMIN')
     })
 
+    const themeDark = computed(() => {
+      return theme.global.name.value === 'dark'
+    })
+
     const logout = () => {
       // criar confirmação?
       localStorage.removeItem('userData')
+      user.value = {}
       navigateTo('/auth')
+    }
+
+    const toggleTheme = () => {
+      theme.global.name.value = theme.global.current.value.dark ? 'light' : 'dark'
     }
 
     watch(() => drawer.value, () => {
@@ -125,17 +177,17 @@ export default {
       }
     })
 
-    onMounted(() => {
-      document.addEventListener('keydown', (e) => {
-        if(e.key === 'Escape') {
-          drawer.value = false
-        }
-      })
-    })
+    // onMounted(() => {
+    //   document.addEventListener('keydown', (e) => {
+    //     if(e.key === 'Escape') {
+    //       drawer.value = false
+    //     }
+    //   })
+    // })
 
-    onBeforeUnmount(() => {
-      document.removeEventListener('keydown', () => {})
-    })
+    // onBeforeUnmount(() => {
+    //   document.removeEventListener('keydown', () => {})
+    // })
 
     return {
       theme,
@@ -145,9 +197,16 @@ export default {
       items,
       DrawerList,
       userAdmin,
+      themeDark,
       logout,
-      toggleTheme: () => theme.global.name.value = theme.global.current.value.dark ? 'light' : 'dark'
+      toggleTheme
     }
   }
 }
 </script>
+
+<style lang="sass" scoped>
+.main-wrapper
+  // margin-left: 10%
+  // margin-right: 10%
+</style>
