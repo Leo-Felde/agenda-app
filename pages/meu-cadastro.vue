@@ -53,7 +53,7 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { isEqual, cloneDeep } from 'lodash-es'
 
 import UsuariosAPI from '~/api/usuarios'
@@ -69,9 +69,17 @@ export default {
     const snackbar = useSnackbar()
     const { $swal } = useNuxtApp()
 
+    const alteracoesPendentes = computed(() => {
+      return editando.value ? !isEqual(usuarioOriginal.value, usuario.value) : false
+    })
+
     const salvar = async () => {
       const { valid } = await form.value.validate()
       if (!valid) return
+      if (!alteracoesPendentes.value) {
+        conclude()
+        return
+      }
 
       try {
         await UsuariosAPI.atualizar(usuario.value)
@@ -91,8 +99,7 @@ export default {
     }
 
     const cancelar = () => {
-      const alteracoesPendentes = !isEqual(usuarioOriginal.value, usuario.value)
-      if (alteracoesPendentes) {
+      if (alteracoesPendentes.value) {
         $swal.fire({
           title: 'Descartar alterações?',
           showCancelButton: true,
@@ -101,15 +108,17 @@ export default {
           cancelButtonText: 'Cancelar',
         }).then((result) => {
           if (result.isConfirmed) {
-            usuario.value = cloneDeep(usuarioOriginal.value)
-            editando.value = false
+            conclude()
           }
         })
       } else {
-        usuario.value = cloneDeep(usuarioOriginal.value)
-        editando.value = false
+        conclude()
       }
+    }
 
+    const conclude = () => {
+      usuario.value = cloneDeep(usuarioOriginal.value)
+      editando.value = false
     }
 
     const buscarUsuarioAtual = async () => {
