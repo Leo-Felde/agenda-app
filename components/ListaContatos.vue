@@ -88,8 +88,10 @@
 import { ref } from 'vue'
 import { VDataTable } from 'vuetify/labs/VDataTable'
 import { VSkeletonLoader } from 'vuetify/labs/VSkeletonLoader'
+import { useDisplay } from 'vuetify'
 
-import ImagemAPI from '~/api/imagem'
+import ContatoAPI from '~/api/contatos'
+import FavoritosAPI from '~/api/favoritos'
 export default {
   components: {
     VDataTable,
@@ -107,8 +109,7 @@ export default {
 
 
   emits: ['atualizar', 'editar'],
-  setup (props) {
-    const { $swal } = useNuxtApp()
+  setup (props, { emit }) {
     const headers = ref([
       {
         title: 'Informações',
@@ -142,14 +143,16 @@ export default {
       }
     ])
 
+    const snackbar = useSnackbar()
+    const { $swal } = useNuxtApp()
+    const { mobile } = useDisplay()
+
     const contatos = computed(() => {
       return props.data
     })
 
     const toggleFavorito = async (contato) => {
       try {
-        console.log('favoritar/desfavoritar')
-        console.log(contato)
         if (contato.favorito) {
           $swal.fire({
             title: 'Desfavoritar?',
@@ -159,15 +162,25 @@ export default {
             reverseButtons: true
           }).then((result) => {
             if (result.isConfirmed) {
-              console.log('BBBBBBB')
-            } else if (
-            /* Read more about handling dismissals below */
-              result.dismiss === Swal.DismissReason.cancel
-            ) {
-              console.log('aaaaaaa')
+              favoritar(contato)
             }
           })
+        } else {
+          favoritar(contato)
         }
+      } catch (error) {
+        console.error(error)
+      }
+    }
+
+    const favoritar = async (contato) => {
+      try {
+        if (contato.favorito) {
+          await FavoritosAPI.excluir(contato.id)
+        } else {
+          await FavoritosAPI.salvar(contato)
+        }
+        emit('atualizar')
       } catch (error) {
         console.error(error)
       }
@@ -175,9 +188,6 @@ export default {
 
     const excluirContato = async (contato) => {
       try {
-        console.log('excluir')
-        console.log(contato)
-        
         $swal.fire({
           title: 'Excluir contato?',
           icon: 'warning',
@@ -185,10 +195,22 @@ export default {
           confirmButtonText: 'Excluir',
           confirmButtonColor: '#d33',
           cancelButtonText: 'Cancelar',
-        }).then((result) => {
-          /* Read more about isConfirmed, isDenied below */
+        }).then(async (result) => {
           if (result.isConfirmed) {
-            // chamar exclusão
+            try {
+              await ContatoAPI.excluir(contato.id)
+              snackbar.add({
+                type: 'success',
+                text: 'contato excluído'
+              })
+              emit('atualizar')
+            } catch (error) {
+              console.error(error)
+              snackbar.add({
+                type: 'error',
+                text: 'Ocorreu um erro ao excluir o contato'
+              })
+            }
           }
         })
       } catch (error) {
@@ -200,6 +222,7 @@ export default {
     return {
       headers,
       contatos,
+      mobile,
       toggleFavorito,
       excluirContato
     }

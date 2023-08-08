@@ -45,7 +45,7 @@ export default {
     }
 
     watch(() => props.modelValue, () => {
-      if (!props.modelValue) return
+      if (!props.modelValue?.id) return
       if (!usuarios.value.some(u => u.id === props.modelValue.id)) {
         usuarios.value.push(props.modelValue)
         setTimeout(() => {
