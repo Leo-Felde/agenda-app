@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/valid-v-slot -->
 <template>
   <v-card
     elevation="0"
@@ -10,6 +11,7 @@
       <v-btn
         color="primary"
         append-icon="mdi-account-plus"
+        @click="novaPessoa"
       >
         Adicionar pessoa
       </v-btn>
@@ -31,25 +33,37 @@
           class="my-2"
         />
       </template>
+      <template #item.nome="{ item }">
+        <td class="text-center">
+          <div class="d-flex">
+            <PessoaImagem :id="item.selectable.id" />
+            <span class="my-2 ml-2">{{ item.selectable.nome }}</span>
+          </div>
+        </td>
+      </template>
       <template #item.actions="{ item }">
         <td class="text-center">
           <v-btn
             icon="mdi-pencil"
             variant="text"
-            @click="$emit('editar', item.selectable)"
+            @click="editarPessoa(item.selectable)"
           />
         </td>
       </template>
       <template #item.endereco="{ item }">
         <td>
           <span class="endereco">
-            {{ item.selectable.endereco.bairro }}
-            , {{ item.selectable.endereco.cidade }} - {{ item.selectable.endereco.estado }}
+            {{ item.selectable.endereco.bairro }}, №{{ item.selectable.endereco.numero }} {{ item.selectable.endereco.cidade }} - {{ item.selectable.endereco.estado }}
               
           </span>
         </td>
       </template>
     </VDataTable>
+    <FormDialogoPessoa
+      v-model="showDialog"
+      :pessoa="pessoaSelecionada"
+      @atualizar="listarPessoas"
+    />
   </v-card>
 </template>
 
@@ -69,6 +83,8 @@ export default {
     // const { $swal } = useNuxtApp()
 
     const loading = ref(false)
+    const showDialog = ref(false)
+    const pessoaSelecionada = ref({})
     const pessoas = ref([])
     const headers = ref([
       {
@@ -85,6 +101,16 @@ export default {
         title: 'Endereço',
         sortable: true,
         key: 'endereco'
+      },
+      {
+        title: 'Logradouro',
+        sortable: true,
+        key: 'endereco.logradouro'
+      },
+      {
+        title: 'CEP',
+        sortable: true,
+        key: 'endereco.cep'
       },
       {
         title: 'Ações',
@@ -114,6 +140,16 @@ export default {
       }
     }
     
+    const editarPessoa = (pessoa) => {
+      pessoaSelecionada.value = pessoa
+      showDialog.value = true
+    }
+
+    const novaPessoa = () => {
+      pessoaSelecionada.value = {}
+      showDialog.value = true
+    }
+
     onMounted(() => {
       listarPessoas()
     })
@@ -121,7 +157,12 @@ export default {
     return {
       headers,
       pessoas,
-      loading
+      showDialog,
+      pessoaSelecionada,
+      loading,
+      listarPessoas,
+      editarPessoa,
+      novaPessoa
     }
   }
 }
