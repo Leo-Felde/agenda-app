@@ -46,7 +46,7 @@ export default {
     })
 
     const titulo = computed(() => {
-      return props.pessoa.id ? 'Alterar pessoa' : 'Novo pessoa'
+      return props.pessoa.id ? 'Alterar pessoa' : 'Nova pessoa'
     })
 
     watch(() => props.pessoa, () => {
@@ -143,7 +143,7 @@ export default {
       } catch (error) {
         snackbar.add({
           type: 'error',
-          text: 'Ocorreu um erro ao carregar o pessoa'
+          text: 'Ocorreu um erro ao carregar a pessoa'
         })
       } finally {
         loading.value = false
