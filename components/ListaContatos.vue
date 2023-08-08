@@ -1,87 +1,89 @@
 <template>
-  <VDataTable
-    item-value="name"
-    fixed-header
-    :headers="headers"
-    :items="contatos"
-    :loading="loading"
-  >
-    <template #loading>
-      <VSkeletonLoader
-        v-for="i in 3"
-        :key="i"
-        width="100%"
-        height="100px"
-        class="my-2"
-      />
-    </template>
+  <div>
+    <VDataTable
+      item-value="name"
+      fixed-header
+      :headers="headers"
+      :items="contatos"
+      :loading="loading"
+    >
+      <template #loading>
+        <VSkeletonLoader
+          v-for="i in 3"
+          :key="i"
+          width="100%"
+          height="100px"
+          class="my-2"
+        />
+      </template>
 
-    <template #item="{ item }">
-      <tr>
-        <td>
-          <div class="d-flex py-2">
-            <PessoaImagem :id="item.selectable.pessoa.id" />
-            <div class="d-flex flex-column my-auto ml-2">
-              <span class="contact-name">
-                {{ item.selectable.pessoa.nome }}
-              </span>
-              <span
-                v-if="item.selectable.email"
-                class="contact-email"
+      <template #item="{ item }">
+        <tr>
+          <td>
+            <div class="d-flex py-2">
+              <PessoaImagem :id="item.selectable.pessoa.id" />
+              <div class="d-flex flex-column my-auto ml-2">
+                <span class="contact-name">
+                  {{ item.selectable.pessoa.nome }}
+                </span>
+                <span
+                  v-if="item.selectable.email"
+                  class="contact-email"
+                >
+                  {{ item.selectable.email }}
+                </span>
+              </div>
+              <v-icon
+                v-if="item.selectable.favorito"
+                color="yellow"
+                class="my-auto ml-5"
               >
-                {{ item.selectable.email }}
-              </span>
+                mdi-star
+              </v-icon>
             </div>
-            <v-icon
-              v-if="item.selectable.favorito"
-              color="yellow"
-              class="my-auto ml-5"
-            >
-              mdi-star
-            </v-icon>
-          </div>
-        </td>
-        <td>{{ item.selectable.tipoContato }}</td>
-        <td>{{ item.selectable.telefone }}</td>
-        <td>{{ item.selectable.pessoa.cpf }}</td>
-        <td>
-          <span class="endereco">
-            {{ item.selectable.pessoa.endereco.bairro }}
-            , {{ item.selectable.pessoa.endereco.cidade }} - {{ item.selectable.pessoa.endereco.estado }}
+          </td>
+          <td>{{ item.selectable.tipoContato }}</td>
+          <td>{{ item.selectable.telefone }}</td>
+          <td>{{ item.selectable.pessoa.cpf }}</td>
+          <td>
+            <span class="endereco">
+              {{ item.selectable.pessoa.endereco.bairro }}
+              , {{ item.selectable.pessoa.endereco.cidade }} - {{ item.selectable.pessoa.endereco.estado }}
               
-          </span>
-        </td>
-        <td class="text-center">
-          <v-btn
-            icon="mdi-pencil"
-            variant="text"
-            @click="$emit('editar', item.selectable)"
-          />
-          <v-menu :close-on-content-click="false">
-            <template #activator="{ props }">
-              <v-btn
-                icon="mdi-dots-vertical"
-                variant="text"
-                v-bind="props"
-              />
-            </template>
-            <v-list>
-              <v-list-item @click="toggleFavorito(item.selectable)">
-                <v-list-item-title>
-                  {{ item.selectable.favorito ? 'Desfavoritar' : 'favoritar' }}
-                </v-list-item-title>
-              </v-list-item>
-              <v-list-item @click="excluirContato(item.selectable)">
-                <v-list-item-title>
-                  Excluir
-                </v-list-item-title>
-              </v-list-item>
-            </v-list>
-          </v-menu>
-        </td>
-      </tr>
-    </template>
-  </VDataTable>
+            </span>
+          </td>
+          <td class="text-center">
+            <v-btn
+              icon="mdi-pencil"
+              variant="text"
+              @click="$emit('editar', item.selectable)"
+            />
+            <v-menu :close-on-content-click="false">
+              <template #activator="{ props }">
+                <v-btn
+                  icon="mdi-dots-vertical"
+                  variant="text"
+                  v-bind="props"
+                />
+              </template>
+              <v-list>
+                <v-list-item @click="toggleFavorito(item.selectable)">
+                  <v-list-item-title>
+                    {{ item.selectable.favorito ? 'Desfavoritar' : 'favoritar' }}
+                  </v-list-item-title>
+                </v-list-item>
+                <v-list-item @click="excluirContato(item.selectable)">
+                  <v-list-item-title>
+                    Excluir
+                  </v-list-item-title>
+                </v-list-item>
+              </v-list>
+            </v-menu>
+          </td>
+        </tr>
+      </template>
+    </VDataTable>
+  </div>
 </template>
 
 <script>

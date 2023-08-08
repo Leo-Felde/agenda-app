@@ -6,3 +6,15 @@
 
 .v-table__wrapper
   max-height: calc(100vh - 248px)
+
+@media (max-width: 768px)
+  .v-data-table
+    thead
+      display: none !important
+    tbody, tr, td
+      display: block !important
+      width: 100% !important
+    td
+      border: none !important
+    tr
+      border-bottom: thin solid rgba(var(--v-border-color), var(--v-border-opacity))

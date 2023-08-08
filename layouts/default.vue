@@ -76,7 +76,8 @@
 
     <v-navigation-drawer
       v-model="drawer"
-      permanent
+      :permanent="!mobile"
+      :temporary="mobile"
     >
       <v-card-title
         v-if="mobile"
@@ -161,7 +162,6 @@ export default {
     })
 
     const logout = () => {
-      // criar confirmação?
       localStorage.removeItem('userData')
       user.value = {}
       navigateTo('/auth')
@@ -176,18 +176,6 @@ export default {
         DrawerList.value.focus()
       }
     })
-
-    // onMounted(() => {
-    //   document.addEventListener('keydown', (e) => {
-    //     if(e.key === 'Escape') {
-    //       drawer.value = false
-    //     }
-    //   })
-    // })
-
-    // onBeforeUnmount(() => {
-    //   document.removeEventListener('keydown', () => {})
-    // })
 
     return {
       theme,
