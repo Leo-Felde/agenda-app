@@ -8,6 +8,7 @@ export default defineNuxtRouteMiddleware((to) => {
 
   const isAuthPage = to.fullPath.includes('/auth')
   if (!user.value?.accessToken && !isAuthPage) {
+    localStorage.removeItem('userData')
     return navigateTo('/auth')
   }
 
