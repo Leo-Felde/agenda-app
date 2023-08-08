@@ -19,6 +19,7 @@
     "core-js": "^3.32.0",
     "defu": "^6.1.2",
     "lodash-es": "^4.17.21",
+    "maska": "^2.1.10",
     "nuxt": "^3.6.5",
     "nuxt-snackbar": "^1.0.3",
     "sweetalert2": "^11.7.20",

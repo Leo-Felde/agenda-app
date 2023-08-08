@@ -33,6 +33,11 @@
           class="my-2"
         />
       </template>
+      <template #item.dataNascimento="{ item }">
+        <td class="text-center">
+          {{ formatarData(item.selectable.dataNascimento) }}
+        </td>
+      </template>
       <template #item.actions="{ item }">
         <td class="text-center">
           <v-btn
@@ -55,6 +60,7 @@
 import { ref, onMounted } from 'vue'
 import { VDataTable } from 'vuetify/labs/VDataTable'
 import { VSkeletonLoader } from 'vuetify/labs/VSkeletonLoader'
+import { formatDate } from '~/utils/formatacao'
 
 import UsuariosAPI from '~/api/usuarios'
 export default {
@@ -63,7 +69,7 @@ export default {
     VSkeletonLoader
   },
 
-  setup () {
+  setup (inject) {
     // const { $swal } = useNuxtApp()
 
     const loading = ref(false)
@@ -124,6 +130,10 @@ export default {
       }
     }
 
+    const formatarData = (data) => {
+      return formatDate(data)
+    }
+
     const editarUsuario = (usuario) => {
       console.log(usuario)
       usuarioSelecionado.value = usuario
@@ -145,6 +155,7 @@ export default {
       loading,
       showDialog,
       usuarioSelecionado,
+      formatarData,
       editarUsuario,
       novoUsuario,
       listarUsuarios
