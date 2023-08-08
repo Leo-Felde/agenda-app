@@ -69,7 +69,7 @@ export default {
     VSkeletonLoader
   },
 
-  setup (inject) {
+  setup () {
     // const { $swal } = useNuxtApp()
 
     const loading = ref(false)
@@ -135,7 +135,6 @@ export default {
     }
 
     const editarUsuario = (usuario) => {
-      console.log(usuario)
       usuarioSelecionado.value = usuario
       showDialog.value = true
     }

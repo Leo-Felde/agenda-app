@@ -20,16 +20,7 @@
       <tr>
         <td>
           <div class="d-flex py-2">
-            <v-avatar
-              color="grey"
-              size="48"
-            >
-              <img
-                :id="`image-${item.selectable.pessoa.id}`"
-                class="user-image"
-                src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1665px-No-Image-Placeholder.svg.png"
-              >
-            </v-avatar>
+            <PessoaImagem :id="item.selectable.pessoa.id" />
             <div class="d-flex flex-column my-auto ml-2">
               <span class="contact-name">
                 {{ item.selectable.pessoa.nome }}
@@ -64,6 +55,7 @@
           <v-btn
             icon="mdi-pencil"
             variant="text"
+            @click="$emit('editar', item.selectable)"
           />
           <v-menu :close-on-content-click="false">
             <template #activator="{ props }">
@@ -101,7 +93,7 @@ import ImagemAPI from '~/api/imagem'
 export default {
   components: {
     VDataTable,
-    VSkeletonLoader
+    VSkeletonLoader,
   },
 
   props: {
@@ -114,7 +106,7 @@ export default {
   },
 
 
-  emits: ['atualizar'],
+  emits: ['atualizar', 'editar'],
   setup (props) {
     const { $swal } = useNuxtApp()
     const headers = ref([
@@ -153,32 +145,6 @@ export default {
     const contatos = computed(() => {
       return props.data
     })
-
-    watch(() => contatos.value, () => {
-      displayImages()
-    })
-
-    const displayImages = () => {
-      contatos.value.forEach(async (contato) => {
-        if (contato.pessoa.foto) {
-          const foto = await getImage(contato.pessoa.id)
-          const imageElement = document.getElementById(`image-${contato.pessoa.id}`)
-          imageElement.src = foto
-        }
-      })
-    }
-
-    const getImage = async (id) => {
-      try {
-        const resp = await ImagemAPI.carregar(id)
-        const blob = new Blob([resp.data], { type: 'image/png' })
-        const imageUrl = URL.createObjectURL(blob)
-        
-        return imageUrl
-      } catch (error) {
-        console.error(error)
-      }
-    }
 
     const toggleFavorito = async (contato) => {
       try {

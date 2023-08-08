@@ -35,7 +35,7 @@
       </template>
       <template #item.nome="{ item }">
         <td class="text-center">
-          <div class="d-flex">
+          <div class="d-flex py-2">
             <PessoaImagem :id="item.selectable.id" />
             <span class="my-2 ml-2">{{ item.selectable.nome }}</span>
           </div>

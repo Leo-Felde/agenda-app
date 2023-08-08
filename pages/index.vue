@@ -10,15 +10,24 @@
       <v-btn
         color="primary"
         append-icon="mdi-account-plus"
+        @click="novoContato"
       >
-        Adicionar usuário
+        Adicionar contato
       </v-btn>
     </v-card-title>
     <v-divider />
+
     <ListaContatos
       class="pt-3"
       :data="lista"
       :loading="loading"
+      @atualizar="listarTodos"
+      @editar="editarContato"
+    />
+
+    <FormDialogoContato
+      v-model="showDialog"
+      :contato="contatoSelecionado"
       @atualizar="listarTodos"
     />
   </v-card>
@@ -40,6 +49,8 @@ export default {
     const favoritos = ref([])
     const lista = ref([])
     const loading = ref(false)
+    const showDialog = ref(false)
+    const contatoSelecionado = ref({})
 
     const listarUsuarios = async () => {
       const id = user.value.id 
@@ -61,7 +72,6 @@ export default {
     }
 
     const listarFavoritos = async () => {
-      // const id = user.value.id 
       loading.value = true
 
       try {
@@ -88,6 +98,16 @@ export default {
       lista.value = favoritos.value.concat(contatos.value)
     }
 
+    const editarContato = (contato) => {
+      contatoSelecionado.value = contato
+      showDialog.value = true
+    }
+
+    const novoContato = () => {
+      contatoSelecionado.value = {}
+      showDialog.value = true
+    }
+
     onMounted(async () => {
       listarTodos()
     })
@@ -95,7 +115,11 @@ export default {
     return {
       lista,
       loading,
-      listarTodos
+      showDialog,
+      contatoSelecionado,
+      listarTodos,
+      editarContato,
+      novoContato
     }
   }
 }
