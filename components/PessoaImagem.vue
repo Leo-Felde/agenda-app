@@ -30,7 +30,7 @@ export default {
         const imageUrl = URL.createObjectURL(blob)
         
         const imageElement = document.getElementById(`image-${props.id}`)
-        imageElement.src = imageUrl
+        if (imageElement) imageElement.src = imageUrl
         return imageUrl
       } catch (error) {
         console.error(error)
