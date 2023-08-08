@@ -21,4 +21,3 @@ npx nuxi dev
 ```
 Após alguns segundos o servidor poderá ser aberto em qualquer navegador pela url `localhost:3000`
 
-```
