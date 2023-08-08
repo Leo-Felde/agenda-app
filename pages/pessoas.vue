@@ -5,8 +5,22 @@
     class="pa-4"
     width="100%"
   >
-    <v-card-title class="d-flex mb-2">
-      Pessoas
+    <v-card-title class="d-flex mb-2 pessoas-header">
+      <span class="title my-auto">Pessoas</span>
+      <v-text-field
+        v-model="search"
+        variant="solo"
+        rounded
+        placeholder="Pesquisar"
+        append-inner-icon="mdi-magnify"
+        hide-details
+        density="compact"
+        class="search ml-3"
+        clearable
+        @click:clear="listarPessoas"
+        @click:append="listarPessoas(true)"
+        @keydown.enter="listarPessoas(true)"
+      />
       <v-spacer />
       <v-btn
         color="primary"
@@ -80,8 +94,7 @@ export default {
   },
 
   setup () {
-    // const { $swal } = useNuxtApp()
-
+    const search = ref('')
     const loading = ref(false)
     const showDialog = ref(false)
     const pessoaSelecionada = ref({})
@@ -120,13 +133,14 @@ export default {
     ])
     const snackbar = useSnackbar()
 
-    const listarPessoas = async () => {
+    const listarPessoas = async (useSearch = false) => {
       // const id = user.value.id 
       loading.value = true
 
       try {
-        const param = { nome: ''}
-        const resp = await PessoasAPI.pesquisar(param)
+        const params = { nome: useSearch ? search.value || '' : ''}
+        console.log(params)
+        const resp = await PessoasAPI.pesquisar(params)
 
         pessoas.value = resp.data
       } catch (error) {
@@ -160,6 +174,7 @@ export default {
       showDialog,
       pessoaSelecionada,
       loading,
+      search,
       listarPessoas,
       editarPessoa,
       novaPessoa
@@ -185,4 +200,12 @@ tr
 
 :deep(.v-skeleton-loader__bone)
   height: inherit
+
+@media (max-width: 768px)
+  .pessoas-header
+    flex-direction: column
+    .title, .search
+      margin-bottom: 5px
+    .title
+      margin-top: 0px !important
 </style>
