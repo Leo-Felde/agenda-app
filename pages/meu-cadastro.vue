@@ -55,6 +55,7 @@
 <script>
 import { ref, onMounted, computed } from 'vue'
 import { isEqual, cloneDeep } from 'lodash-es'
+import { formatDate } from '~/utils/formatacao'
 
 import UsuariosAPI from '~/api/usuarios'
 export default {
@@ -121,13 +122,15 @@ export default {
       editando.value = false
     }
 
-    const buscarUsuarioAtual = async () => {
+    const carregar = async () => {
       const id = user.value.id 
       loading.value = true
 
       try {
         const resp = await UsuariosAPI.buscar(id)
+
         usuarioOriginal.value = resp.data.object.usuario
+        usuarioOriginal.value.dataNascimento = formatDate(usuarioOriginal.value.dataNascimento)
         usuario.value = cloneDeep(usuarioOriginal.value)
       } catch (error) {
         snackbar.add({
@@ -140,7 +143,7 @@ export default {
     }
 
     onMounted(() => {
-      buscarUsuarioAtual()
+      carregar()
     })
 
     return {

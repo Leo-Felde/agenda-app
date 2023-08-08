@@ -140,7 +140,7 @@ export default {
   setup (props) {
     const form = ref({})
     const maskCpf = { mask: '###.###.###-##' }
-    const maskTelefone = { mask: '(##) #####-####'}
+    const maskTelefone = { mask: '(##) ####-####' }
     const maskData = { mask: '##/##/####'}
     const showPassword = ref(false)
     const tiposUsuario = ref([
