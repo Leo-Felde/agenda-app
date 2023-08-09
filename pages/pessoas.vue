@@ -5,7 +5,7 @@
     class="pa-4"
     width="100%"
   >
-    <v-card-title class="d-flex mb-2 pessoas-header">
+    <v-card-title class="d-flex mb-2 search-header">
       <span class="title my-auto">Pessoas</span>
       <v-text-field
         v-model="search"
@@ -23,6 +23,7 @@
       />
       <v-spacer />
       <v-btn
+        search
         color="primary"
         append-icon="mdi-account-plus"
         @click="novaPessoa"
@@ -134,12 +135,10 @@ export default {
     const snackbar = useSnackbar()
 
     const listarPessoas = async (useSearch = false) => {
-      // const id = user.value.id 
       loading.value = true
 
       try {
         const params = { nome: useSearch ? search.value || '' : ''}
-        console.log(params)
         const resp = await PessoasAPI.pesquisar(params)
 
         pessoas.value = resp.data
@@ -200,12 +199,4 @@ tr
 
 :deep(.v-skeleton-loader__bone)
   height: inherit
-
-@media (max-width: 768px)
-  .pessoas-header
-    flex-direction: column
-    .title, .search
-      margin-bottom: 5px
-    .title
-      margin-top: 0px !important
 </style>

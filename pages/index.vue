@@ -4,8 +4,22 @@
     class="pa-4"
     width="100%"
   >
-    <v-card-title class="d-flex mb-2">
-      Meus contatos
+    <v-card-title class="d-flex mb-2 search-header">
+      <span class="title my-auto">Contatos</span>
+      <v-text-field
+        v-model="search"
+        variant="solo"
+        rounded
+        placeholder="Pesquisar"
+        append-inner-icon="mdi-magnify"
+        hide-details
+        density="compact"
+        class="search ml-3"
+        clearable
+        @click:clear="listarTodos"
+        @click:append-inner="listarTodos(true)"
+        @keydown.enter="listarTodos(true)"
+      />
       <v-spacer />
       <v-btn
         color="primary"
@@ -43,21 +57,29 @@ export default {
   name: 'Index',
 
   setup () {
-    const user = useCurrentUser()
-    const snackbar = useSnackbar()
     const contatos = ref([])
     const favoritos = ref([])
     const lista = ref([])
     const loading = ref(false)
     const showDialog = ref(false)
     const contatoSelecionado = ref({})
+    const search = ref(null)
 
-    const listarUsuarios = async () => {
+    const user = useCurrentUser()
+    const snackbar = useSnackbar()
+
+    const listarUsuarios = async (useSearch = false) => {
       const id = user.value.id 
       loading.value = true
 
       try {
-        const resp = await ContatosAPI.listar(id)
+        let resp
+        if (useSearch && search.value) {
+          const param = { termo: search.value}
+          resp = await ContatosAPI.pesquisar(param)
+        } else {
+          resp = await ContatosAPI.listar(id)
+        }
 
         contatos.value = resp.data
       } catch (error) {
@@ -75,7 +97,10 @@ export default {
       loading.value = true
 
       try {
-        const resp = await FavoritosAPI.pesquisar()
+        const param = {
+          termo: 'teste'
+        }
+        const resp = await FavoritosAPI.pesquisar(param)
 
         favoritos.value = resp.data
         favoritos.value.forEach((favorito) => { // adiciona o booleano 'favorito: true' para todos os registros
@@ -92,8 +117,8 @@ export default {
       }
     }
 
-    const listarTodos = async () => {
-      await listarUsuarios()
+    const listarTodos = async (useSearch = false) => {
+      await listarUsuarios(useSearch)
       await listarFavoritos()
       lista.value = favoritos.value.concat(contatos.value)
     }
@@ -116,6 +141,7 @@ export default {
       lista,
       loading,
       showDialog,
+      search,
       contatoSelecionado,
       listarTodos,
       editarContato,
