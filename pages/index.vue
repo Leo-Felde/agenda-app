@@ -90,7 +90,7 @@ export default {
       loading.value = true
 
       try {
-        const resp = await FavoritosAPI.pesquisar(param)
+        const resp = await FavoritosAPI.pesquisar()
 
         favoritos.value = resp.data
         favoritos.value.forEach((favorito) => { // adiciona o booleano 'favorito: true' para todos os registros
