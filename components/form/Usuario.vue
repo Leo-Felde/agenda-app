@@ -7,8 +7,21 @@
         md="4"
       >
         <v-text-field
-          v-model="form.username"
+          v-model="form.nome"
           label="Nome"
+          required
+          :readonly="readonly"
+          :rules="[rules.required]"
+        />
+      </v-col>
+      <v-col
+        cols="12"
+        sm="12"
+        md="4"
+      >
+        <v-text-field
+          v-model="form.username"
+          label="Nome de usuário"
           required
           :readonly="readonly"
           :rules="[rules.required]"
@@ -28,6 +41,8 @@
           :rules="[rules.required, rules.cpf]"
         />
       </v-col>
+    </v-row>
+    <v-row>
       <v-col
         cols="12"
         sm="12"
@@ -42,8 +57,6 @@
           :rules="[rules.required]"
         />
       </v-col>
-    </v-row>
-    <v-row>
       <v-col
         cols="12"
         sm="12"

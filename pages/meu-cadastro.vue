@@ -83,16 +83,24 @@ export default {
       }
 
       try {
-        await UsuariosAPI.atualizar(usuario.value)
+        const param = {
+          usuario: usuario.value
+        }
+        param.usuario.dataNascimento = formatDate(param.usuario.dataNascimento, false)
+
+        await UsuariosAPI.atualizar(param.usuario)
         snackbar.add({
           type: 'success',
           text: 'Usuário atualizado'
         })
         editando.value = false
+        setTimeout(() => {
+          carregar()
+        }, 200)
       } catch (error) {
         snackbar.add({
           type: 'error',
-          text: 'Ocorreu um erro ao buscar o usuário'
+          text: 'Ocorreu um erro ao alterar seus dados'
         })
       } finally {
         loading.value = false
@@ -131,6 +139,9 @@ export default {
 
         usuarioOriginal.value = resp.data.object.usuario
         usuarioOriginal.value.dataNascimento = formatDate(usuarioOriginal.value.dataNascimento)
+
+        delete usuarioOriginal.value.password
+
         usuario.value = cloneDeep(usuarioOriginal.value)
       } catch (error) {
         snackbar.add({
