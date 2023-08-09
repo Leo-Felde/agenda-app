@@ -65,21 +65,14 @@ export default {
     const contatoSelecionado = ref({})
     const search = ref(null)
 
-    const user = useCurrentUser()
     const snackbar = useSnackbar()
 
     const listarUsuarios = async (useSearch = false) => {
-      const id = user.value.id 
       loading.value = true
 
       try {
-        let resp
-        if (useSearch && search.value) {
-          const param = { termo: search.value}
-          resp = await ContatosAPI.pesquisar(param)
-        } else {
-          resp = await ContatosAPI.listar(id)
-        }
+        const param = { termo: useSearch ? search.value || '' : ''}
+        const resp = await ContatosAPI.pesquisar(param)
 
         contatos.value = resp.data
       } catch (error) {
@@ -97,9 +90,6 @@ export default {
       loading.value = true
 
       try {
-        const param = {
-          termo: 'teste'
-        }
         const resp = await FavoritosAPI.pesquisar(param)
 
         favoritos.value = resp.data
