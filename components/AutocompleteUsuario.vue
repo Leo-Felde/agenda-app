@@ -45,14 +45,18 @@ export default {
     }
 
     watch(() => props.modelValue, () => {
-      if (!props.modelValue?.id) return
-      if (!usuarios.value.some(u => u.id === props.modelValue.id)) {
-        usuarios.value.push(props.modelValue)
-        setTimeout(() => {
-          usuarioSelecionado.value = props.modelValue
-        }, 100)
+      if (!props.modelValue?.id) {
+        if (!usuarios.value.some(u => u.id === props.modelValue.id)) {
+          usuarios.value.push(props.modelValue)
+          setTimeout(() => {
+            usuarioSelecionado.value = props.modelValue
+          }, 100)
+        }
+      } else {
+        buscarUsuarios('')
       }
     })
+    
     
     onMounted(() => {
       if (props.modelValue) {

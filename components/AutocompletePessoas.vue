@@ -45,12 +45,15 @@ export default {
     }
 
     watch(() => props.modelValue, () => {
-      if (!props.modelValue?.id) return
-      if (!pessoas.value.some(p => p.id === props.modelValue.id)) {
-        pessoas.value.push(props.modelValue)
-        setTimeout(() => {
-          pessoaSelecionada.value = props.modelValue
-        }, 100)
+      if (props.modelValue?.id) {
+        if (!pessoas.value.some(p => p.id === props.modelValue.id)) {
+          pessoas.value.push(props.modelValue)
+          setTimeout(() => {
+            pessoaSelecionada.value = props.modelValue
+          }, 100)
+        }
+      } else {
+        buscarPessoas('')
       }
     })
 
